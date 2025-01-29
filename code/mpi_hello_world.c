@@ -9,12 +9,28 @@
 //
 #include <mpi.h>
 #include <stdio.h>
+#include <sys/time.h>
+
+#define UCS_MSEC_PER_SEC 1000ull
+
+static inline double get_accurate_time()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec + (tv.tv_usec / (double)UCS_MSEC_PER_SEC);
+}
 
 int main(int argc, char** argv) {
   // Initialize the MPI environment. The two arguments to MPI Init are not
   // currently used by MPI implementations, but are there in case future
   // implementations might need the arguments.
+  double start, end;
+  start = get_accurate_time();
+
   MPI_Init(NULL, NULL);
+
+  end = get_accurate_time();
+  printf("MPI_Init - time taken (msec): %f\n", end - start);
 
   // Get the number of processes
   int world_size;
