@@ -12,12 +12,13 @@
 #include <sys/time.h>
 
 #define UCS_MSEC_PER_SEC 1000ull
+#define UCS_USEC_PER_SEC 1000000ull
 
-static inline double get_accurate_time()
+static double get_accurate_time()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return tv.tv_sec + (tv.tv_usec / (double)UCS_MSEC_PER_SEC);
+    return (tv.tv_sec + (tv.tv_usec / (double)UCS_USEC_PER_SEC)) * UCS_MSEC_PER_SEC;
 }
 
 int main(int argc, char** argv) {
@@ -30,7 +31,7 @@ int main(int argc, char** argv) {
   MPI_Init(NULL, NULL);
 
   end = get_accurate_time();
-  printf("MPI_Init - time taken (msec): %f\n", end - start);
+  printf("MPI_Init (msec): %f\n", end - start);
 
   // Get the number of processes
   int world_size;
@@ -46,8 +47,8 @@ int main(int argc, char** argv) {
   MPI_Get_processor_name(processor_name, &name_len);
 
   // Print off a hello world message
-  printf("Hello world from processor %s, rank %d out of %d processors\n",
-         processor_name, world_rank, world_size);
+  // printf("Hello world from processor %s, rank %d out of %d processors\n",
+  //        processor_name, world_rank, world_size);
 
   // Finalize the MPI environment. No more MPI calls can be made after this
   MPI_Finalize();
